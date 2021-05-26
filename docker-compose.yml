@@ -1,0 +1,60 @@
+version: "2.3"
+
+services:
+
+  local:
+    build:
+      context: .
+      args:
+        APPROOV_SITE_KEY: "${APPROOV_SITE_KEY}"
+        FINGERPRINTJS_BROWSER_TOKEN: "${FINGERPRINTJS_BROWSER_TOKEN}"
+    image: ${DOCKER_IMAGE? Missing env var for DOCKER_IMAGE}
+    volumes:
+      - ./nginx/nginx-behind-traefik.conf:/etc/nginx/nginx.conf
+      - ./shapes-app:/usr/share/nginx/html
+    ports:
+      - 8000:8000
+    networks:
+      - default
+
+  dev:
+    build:
+      context: .
+      args:
+        APPROOV_SITE_KEY: "${APPROOV_SITE_KEY}"
+        FINGERPRINTJS_BROWSER_TOKEN: "${FINGERPRINTJS_BROWSER_TOKEN}"
+    image: ${DOCKER_IMAGE? Missing env var for DOCKER_IMAGE}
+    volumes:
+      - ./nginx/nginx-behind-traefik.conf:/etc/nginx/nginx.conf
+      - ./shapes-app:/usr/share/nginx/html
+    networks:
+      - traefik
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=${SERVER_HOSTNAME? Missing env var SERVER_HOSTNAME}"
+      - "traefik.docker.network=traefik"
+      - "traefik.port=${SERVER_HTTP_PORT}"
+      - "traefik.frontend.rule=Host:${PUBLIC_DOMAIN}"
+
+  app:
+    build:
+      context: .
+      args:
+        APPROOV_SITE_KEY: "${APPROOV_SITE_KEY}"
+        FINGERPRINTJS_BROWSER_TOKEN: "${FINGERPRINTJS_BROWSER_TOKEN}"
+    image: ${DOCKER_IMAGE? Missing env var for DOCKER_IMAGE}
+    restart: unless-stopped
+    networks:
+      - traefik
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=${SERVER_HOSTNAME? Missing env var SERVER_HOSTNAME}"
+      - "traefik.docker.network=traefik"
+      - "traefik.port=${SERVER_HTTP_PORT}"
+      - "traefik.frontend.rule=Host:${PUBLIC_DOMAIN}"
+
+networks:
+  traefik:
+    external: true
