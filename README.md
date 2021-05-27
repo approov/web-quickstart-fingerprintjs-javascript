@@ -1,8 +1,10 @@
-# Approov Web QuickStart - Javascript
+# Approov Web QuickStart: FingerprintJS - Javascript
 
 [Approov](https://approov.io) is an API security solution used to verify that requests received by your API services originate from trusted versions of your apps.
 
-This quickstart is written specifically for web apps making API calls that you wish to protect with the Approov FingerprintJS integration. The quickstart is agnostic of any web framework, because the simple Javascript functions it relies on are easily ported to any web framework.
+This quickstart is written specifically for web apps making API calls that you wish to protect with the Approov FingerprintJS integration.
+
+The quickstart is agnostic of any web framework, because the simple Javascript functions it relies on are easily ported to any web framework.
 
 This quickstart provides a step-by-step example of integrating Approov with FingerprintJS into a web app using a simple Shapes example that shows a geometric shape based on a request to an API backend that can be protected with Approov.
 
@@ -47,7 +49,7 @@ If you are looking for another Approov integration you can check our list of [qu
 
 This quickstart uses a static web app, therefore agnostic of which web server will be used to serve it.
 
-We will give you three quick options, but feel free to use any web server of tour choice to server the web app from `./shapes-app/index.html`.
+We will give you three quick options, but feel free to use any web server of your choice to serve the web app from `./shapes-app/index.html`.
 
 ### Docker
 
@@ -109,7 +111,7 @@ This contacts `https://shapes.approov.io/v1/shapes` to get a random shape.
 
 In a real world scenario the shapes endpoint would be an endpoint that you want to protect from being exploited/abused from unauthorized clients, like bots or modified web apps.
 
-To protect this endpoints you decide to start using Approov with FirngerprintJS. To simulate the web app working with an API enpoint protected with Approov edit `shapes-app/unprotected/assets/js/app.js` and change the `API_VERSION` to `v2`, like this:
+To protect this endpoints you decide to start using Approov with FingerprintJS. To simulate the web app working with an API enpoint protected with Approov edit `shapes-app/unprotected/assets/js/app.js` and change the `API_VERSION` to `v2`, like this:
 
 ```js
 const API_VERSION = "v2"
@@ -255,7 +257,7 @@ To use Approov with FingerprintJS in the web app we need a small amount of confi
 
 First, Approov needs to know the API domain that will be protected and have it configured with [web protection](https://approov.io/docs/latest/approov-usage-documentation/#enable-web-protection-for-an-api).
 
-In order for Approov tokens to be generated for `https://shapes.approov.io/v2/shapes` it is necessary to inform Approov about it. If you are using a demo account this is unnecessary as it is already setup. For a trial account do:
+In order for Approov tokens to be generated for `https://shapes.approov.io/v2/shapes` it is necessary to inform Approov about it, and you can do it with:
 
 ```
 approov api -add shapes.approov.io -allowWeb
@@ -275,8 +277,10 @@ You need to go into the [FingerprintJS Dashboard](https://dashboard.fingerprintj
 Considering that your browser token is `aaaaa12345`  and the API token is `bbbbb12345` then your command should look like this:
 
 ```text
-approov web -fingerprintjs -add aaaaa12345 -apiToken bbbbb12345 -region RoW
+approov web -fingerprintjs -add aaaaa12345 -apiToken bbbbb12345 -region RoW -embedResult
 ```
+
+We add the `-embedResult` flag only when we want to [have access](https://approov.io/docs/latest/approov-usage-documentation/#approov-embed-token-claim-for-fingerprintjs) to the full response from the FingerprintJS request lookup made by the Approov web attester to the FingerprintJS API. In this quickstart we are adding it for debug proposes only.
 
 ### Replace the Code Placeholders
 
@@ -295,13 +299,13 @@ sed -i "s|___FINGERPRINTJS_BROWSER_TOKEN___|aaaaa12345|" ./shapes-app/unprotecte
 
 #### Approov Site Key
 
-The Approov site key, that we can be obtained with:
+The Approov site key, that can be obtained with:
 
 ```text
-approov web -list | head -1
+approov web -list
 ```
 
-The output will look like:
+Somewhere in the output you will find the `Site Key`, that looks like:
 
 ```text
 Site Key: 123a4567-abcd-12e3-9z8a-9b1234d54321
@@ -327,30 +331,30 @@ sed -i "s|___APPROOV_ATTESTER_URL___|https://web-1.approovr.io/attest|" ./shapes
 
 ## RUNNING THE SHAPES WEB APP WITH APPROOV AND FINGERPRINTJS
 
-Now, that we have completed the Approov FingerprintJS integration into the unprotected Shapes web app it's time ot test it again.
+Now, that we have completed the Approov FingerprintJS integration into the unprotected Shapes web app it's time to test it again.
 
 Refresh the browser with `ctrl + F5` and then click in the `SHAPES` button and this time instead of a bad request we should get a shape:
 
 !["Shapes protected web app Shape page"](/readme-images/protected-v2-shape-page.png)
 
-This time we got a shape because the web app is doing the API request to the Shapes endpoint with a valid Approov token.
+This time we got a shape because the web app is performing the API request to the Shapes endpoint with a valid Approov token.
 
 [TOC](#toc-table-of-contents)
 
 
 ## WHAT IF I DON'T GET SHAPES
 
-If none of the below helps you find your error, then we advise you to double chack carefully that you followed exactly all the steps, and maybe even start from scratch again. If you still experience issues fill free to contact us.
+If none of the below helps you find your error, then we advise you to double check carefully that you followed exactly all the steps, and maybe even start from scratch again. If you still experience issues feel free to contact us.
 
 ### Browser Developer Tools
 
 Open the browser developer tools and double check if you can see any errors in the console.
 
-If you find errors related with the `app.js` file then fix them and retry again, but always remember to refresh the browser with `ctrl + F5` wen updating Javascript.
+If you find errors related with the `app.js` file then fix them and retry again, but always remember to refresh the browser with `ctrl + F5` when updating Javascript.
 
 ### FingerprintJS Script
 
-Double check that you are correctly loading the script in the `shapes-app/unprotected/index.html` and that you are initiating correctly FingerprintJS in the window load event listener at the `shapes-app/approov-fingerprintjs-protected/assets/js/app.js` file, and that you have assigned it to the `fpPromise` variable defined at the top of the same file.
+Double check that you are correctly loading the script in the `shapes-app/unprotected/index.html` file and that you are initiating correctly FingerprintJS in the window load event listener at the `shapes-app/approov-fingerprintjs-protected/assets/js/app.js` file, and that you have assigned it to the `fpPromise` variable defined at the top of the same file.
 
 ### FingerprintJS Token
 
@@ -372,7 +376,7 @@ Double check that you are using the correct Approov site key:
 
 ### Shapes API Domain
 
-Double check that you have added with Approov CLI the `shapes.approov.io` API with web enabled.
+Double check that you have added with the Approov CLI the `shapes.approov.io` API with web enabled.
 
 ```text
 approov api -list
@@ -381,11 +385,77 @@ approov api -list
 ### Approov FingerprintJS Subscription
 
 Double check that you have added with the Approov CLI the correct FingerprintJS subscription:
-* check the FingerprintJS browser token is the same the correct one and that doesn't have a typo
+* check the FingerprintJS browser token is the correct one and that doesn't have a typo
 * check the FingerprintJS API token is the correct one and doesn't have a typo
 
 ```text
 approov web -list
+```
+
+### Approov Live Metrics
+
+Use the Approov CLI to see the [Live Metrics](https://approov.io/docs/latest/approov-usage-documentation/#live-metrics) and identify the cause of the failure.
+
+```text
+approov metrics
+```
+
+This will open a Grafana dashboard in your browser from where you can see detailed metrics.
+
+### Approov Web Attester Errors
+
+If something is wrong with your Approov integration, that prevents the Approov web attester to complete the attestation, then an error response will be returned.
+
+See [here](https://approov.io/docs/latest/approov-usage-documentation/#troubleshooing-web-protection-errors) the complete list of possible errors that can be returned by the Approov web attester.
+
+If the error is not displayed in the web page you may need to open the browser developer tools and inspect the json response payload for the request made to the Approov web attester.
+
+### Debug the Approov Token
+
+The Approov CLI allows to check the approov token validity and its claims.
+
+Open the browser developers tools and from the network tab grab the Approov token from the request header `Approov-Token` and then check it with:
+
+```text
+approov token -check <approov-token-here>
+```
+
+In the output of the above command look for the [embed](https://approov.io/docs/latest/approov-usage-documentation/#approov-embed-token-claim-for-fingerprintjs) claim that contains the response details for FingerprintJS.
+
+Example of the `embed` claim present in an Approov token:
+
+```json
+{
+  "exp": 1620128085,
+  "ip": "1.2.3.4",
+  "arc": "EAM2W37PSU",
+  "embed": {
+    "fpjs:wdATWfQIsdYwATBYYIch": {
+      "visitorId": "eZsCHxhztqEOX0ZmOlwi",
+      "visits": [
+        {
+          "requestId": "Otc6rGJcax7PrUuby7GA",
+          "browserDetails": {
+            "browserName": "Chrome",
+            "browserMajorVersion": "90",
+            "browserFullVersion": "90.0.4430",
+            "os": "Linux",
+            "device": "Other",
+            "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36",
+            "botProbability": 0
+          },
+          "incognito": false,
+          "ip": "1.2.3.4",
+          "ipLocation": { "<IP-keys...>": "<IP-values...>" },
+          "time": "2021-05-04T11:32:30Z",
+          "timestamp": 1620127950391,
+          "url": "<URL-of-the-calling-webpage>",
+          "tag": {}
+        }
+      ]
+    }
+  }
+}
 ```
 
 [TOC](#toc-table-of-contents)
@@ -397,7 +467,6 @@ This quick start guide has taken you through the steps of adding Approov with Fi
 
 You can follow exactly the same steps to add Approov with FingerprintJS into your own web app.
 
-
 ### API Domains
 
 Remember you need to [add](https://approov.io/docs/latest/approov-usage-documentation/#enable-web-protection-for-an-api) all of the API domains that you wish to protect with Approov and FingerprintJS without forgetting to enable the web protection with the `-allowWeb` flag.
@@ -406,9 +475,14 @@ Remember you need to [add](https://approov.io/docs/latest/approov-usage-document
 
 The Shapes example app uses the API endpoint `https://shapes.approov.io/v2/shapes` hosted on Approov's servers and you can see the code for it in this [Github repo](https://github.com/approov/quickstart-nodejs-koa_shapes-api).
 
-If you want to integrate Approov into your own web app you will need to [integrate](https://approov.io/docs/latest/approov-usage-documentation/#backend-integration) an Approov token check on its backend. Since the Approov token is simply a standard [JWT](https://en.wikipedia.org/wiki/JSON_Web_Token) this is usually straightforward.
+If you want to integrate Approov into your own web app you will need to [integrate](https://approov.io/docs/latest/approov-usage-documentation/#backend-integration) an Approov token check on its backend.
+
+Since the Approov token is simply a standard [JWT](https://en.wikipedia.org/wiki/JSON_Web_Token) this is usually straightforward. A complementary check for the FingerprintJS `vistorID` is also recommended and you can learn more about why [here](https://approov.io/docs/latest/approov-usage-documentation/#fingerprintjs).
 
 Check this [Backend integration](https://approov.io/docs/latest/approov-integration-examples/backend-api/) examples that provide a detailed walk-through for specific programming languages and frameworks.
+
+[TOC](#toc-table-of-contents)
+
 
 ## SECURITY HEADERS
 
