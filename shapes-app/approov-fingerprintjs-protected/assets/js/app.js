@@ -23,12 +23,12 @@ window.addEventListener('load', (event) => {
 const API_VERSION = "v2"
 const API_DOMAIN = "shapes.approov.io"
 const API_BASE_URL = "https://" + API_DOMAIN
+const APPROOV_ATTESTER_URL = 'https://web-1.approovr.io/attest'
 
 // Check the Dockerfile to see how place holders are replaced during the
 // Docker image build.
 const APPROOV_SITE_KEY = '___APPROOV_SITE_KEY___'
 const FINGERPRINTJS_BROWSER_TOKEN = '___FINGERPRINTJS_BROWSER_TOKEN___'
-const APPROOV_ATTESTER_URL = '___APPROOV_ATTESTER_URL___'
 
 function initFingerprintJS() {
   // Initialize an agent at application startup.

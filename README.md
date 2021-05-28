@@ -175,15 +175,14 @@ const API_DOMAIN = "shapes.approov.io"
 const API_BASE_URL = "https://" + API_DOMAIN
 ```
 
-Modify the file `shapes-app/unprotected/assets/js/app.js` to insert between `const API_BASE_URL` and `fetchHello()` the following code:
+Modify the file `shapes-app/unprotected/assets/js/app.js` to insert between `const APPROOV_ATTESTER_URL` and `fetchHello()` the following code:
 
 ```js
-// const API_BASE_URL = "https://" + API_DOMAIN
+// const APPROOV_ATTESTER_URL = 'https://web-1.approovr.io/attest'
 
 // Replace the placeholders with your own values
 const APPROOV_SITE_KEY = '___APPROOV_SITE_KEY___'
 const FINGERPRINTJS_BROWSER_TOKEN = '___FINGERPRINTJS_BROWSER_TOKEN___'
-const APPROOV_ATTESTER_URL = '___APPROOV_ATTESTER_URL___'
 
 function initFingerprintJS() {
   // Initialize an agent at application startup.
@@ -317,14 +316,6 @@ Replace the placeholder `___APPROOV_SITE_KEY___` directly in the code or just do
 sed -i "s|___APPROOV_SITE_KEY___|123a4567-abcd-12e3-9z8a-9b1234d54321|" ./shapes-app/unprotected/assets/js/app.js
 ```
 > **NOTE:** Replace the dummy Approov site key token `123a4567-abcd-12e3-9z8a-9b1234d54321` with your own one.
-
-#### Approov Web Attester
-
-Replace the placeholder `___APPROOV_SITE_KEY___` directly in the code or just do it with:
-
-```text
-sed -i "s|___APPROOV_ATTESTER_URL___|https://web-1.approovr.io/attest|" ./shapes-app/unprotected/assets/js/app.js
-```
 
 [TOC](#toc-table-of-contents)
 
