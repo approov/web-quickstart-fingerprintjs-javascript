@@ -73,7 +73,7 @@ function addRequestHeaders() {
     })
     .then(approovToken => {
       return new Headers({
-        'Api-Key': 'your-api-key-goes-here',
+        'Accept': 'application/json', // fix the default being anything "*/*"
         'Approov-Token': approovToken
       })
     })

@@ -23,7 +23,7 @@ function addRequestHeaders() {
   return new Promise(function(resolve, reject) {
     resolve(
       new Headers({
-        'Api-Key': 'your-api-key-goes-here'
+        'Accept': 'application/json', // fix the default being anything "*/*"
       })
     )
   })

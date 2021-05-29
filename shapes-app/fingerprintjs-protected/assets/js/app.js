@@ -47,7 +47,7 @@ function addRequestHeaders() {
     })
     .then(fingerprintJsToken => {
       return new Headers({
-        'Api-Key': 'your-api-key-goes-here',
+        'Accept': 'application/json', // fix the default being anything "*/*"
         'FingerprintJS-Token': fingerprintJsToken
       })
     })
