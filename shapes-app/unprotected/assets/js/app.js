@@ -1,18 +1,12 @@
 window.addEventListener('load', (event) => {
   const navbar = document.getElementById('toggle-navbar')
-  navbar.addEventListener('click', (event) => {
-      toggleNavbar('example-collapse-navbar')
-  })
+  navbar.addEventListener('click', (event) => toggleNavbar('example-collapse-navbar'))
 
   const helloButton = document.getElementById('hello-button')
-  helloButton.addEventListener('click', (event) => {
-      fetchHello()
-  })
+  helloButton.addEventListener('click', (event) => fetchHello())
 
   const shapeButton = document.getElementById('shape-button')
-  shapeButton.addEventListener('click', (event) => {
-      fetchShape()
-  })
+  shapeButton.addEventListener('click', (event) => fetchShape())
 })
 
 const API_VERSION = "v1"
@@ -33,30 +27,22 @@ function makeApiRequest(path) {
   hideFromScreen()
 
   return addRequestHeaders()
-    .then(headers => {
-      return fetch(API_BASE_URL + '/' + path, { headers: headers })
-    })
+    .then(headers => fetch(API_BASE_URL + '/' + path, { headers: headers }))
 }
 
 function fetchHello() {
   makeApiRequest(API_VERSION + '/hello')
-    .then(response => {
-      return handleApiResponse(response)
-    })
+    .then(response => handleApiResponse(response))
     .then(data => {
       document.getElementById('start-app').classList.add("hidden")
       document.getElementById('hello').classList.remove("hidden")
     })
-    .catch(error => {
-      handleApiError('Fetch from ' + API_VERSION + '/hello failed', error)
-    })
+    .catch(error => handleApiError('Fetch from ' + API_VERSION + '/hello failed', error))
 }
 
 function fetchShape() {
   makeApiRequest(API_VERSION + '/shapes')
-    .then(response => {
-      return handleApiResponse(response)
-    })
+    .then(response => handleApiResponse(response))
     .then(data => {
 
       if (data.status >= 400 ) {
@@ -65,12 +51,10 @@ function fetchShape() {
       }
 
       let node = document.getElementById('shape')
-      node.classList.add('shape-' + getRandomShape())
+      node.classList.add('shape-' + data.shape.toLowerCase())
       node.classList.remove("hidden")
     })
-    .catch(error => {
-      handleApiError('Fetch from ' + API_VERSION + '/shapes failed', error)
-    })
+    .catch(error => handleApiError('Fetch from ' + API_VERSION + '/shapes failed', error))
 }
 
 function handleApiResponse(response) {
@@ -81,6 +65,8 @@ function handleApiResponse(response) {
     console.debug('Error Response Body Text', response.text())
     throw new Error(response.status + ' ' + response.statusText)
   }
+
+  document.getElementById('success').classList.remove("hidden")
 
   return response.json();
 }
@@ -95,23 +81,12 @@ function handleApiError(message, error) {
   node.classList.remove("hidden")
 }
 
-function getRandomShape() {
-  const shapes = [
-    "circle",
-    "rectangle",
-    "square",
-    "triangle",
-  ]
-
-  const randomIndex = Math.floor(Math.random() * shapes.length);
-  return shapes[randomIndex];
-}
-
 function hideFromScreen() {
   document.getElementById('start-app').classList.add("hidden");
   document.getElementById('confused').classList.add("hidden");
   document.getElementById('hello').classList.add("hidden");
   document.getElementById('shape').className = "hidden"
+  document.getElementById('success').className = "hidden"
   document.getElementById('spinner').classList.remove("hidden")
 }
 

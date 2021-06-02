@@ -15,7 +15,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
     />
     <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/app.css">
+    <link rel="stylesheet" href="./assets/css/app.css">
     <title>Approov FingerprintJS Quickstart</title>
   </head>
   <body class="text-gray-800 antialiased bg-gray-100">
@@ -119,7 +119,7 @@
           </svg>
         </div>
       </section>
-      <section class="relative pt-20 pb-4">
+      <section class="relative pt-20 pb-0">
         <div class="container mx-auto px-4">
           <div
             class="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-xl rounded-lg -mt-64"
@@ -140,50 +140,62 @@
                   </div>
                 </div>
               </div>
-              <div id="profile-section-header" class="text-center mt-16">
+              <div class="pt-4">
+                <a href="/"><i class="fas fa-home"></i></a>
+              </div>
+              <div id="profile-section-header" class="text-center mt-8">
                 <h3
-                  class="text-4xl font-semibold leading-normal mb-2 text-gray-800 mb-2"
+                  class="text-4xl font-semibold leading-normal mb-2 text-gray-800"
                 >
                   Shapes App
                 </h3>
                 <h4 class="font-semibold">API Requests not protected</h4>
-                <div id="app-body" class="mb-2 text-gray-700 mt-10">
-                  <div id="start-app">Click the <strong>Hello</strong> button to start...</div>
-                  <div id="hello" class="hidden"><img src="assets/img/hello.png" class="m-auto"><span>200: OK</span></div>
+                <div id="app-body" class="my-2 text-gray-700">
+                  <div id="start-app">Click the <strong>Hello</strong> or <strong>Shapes</strong> button to make an unprotected API request...</div>
+                  <div id="hello" class="hidden"><img src="assets/img/hello.png" class="m-auto"></div>
                   <div id="confused" class="hidden"><img src="assets/img/confused.png" class="m-auto"><span id="confused-message">400: Bad Request</span></div>
-                  <div id="spinner" class="hidden m-auto w-32 h-32"><img src="assets/svg/circles.svg" /></i></div>
+                  <div id="spinner" class="hidden m-auto w-32 h-32"><img src="assets/svg/circles.svg" /></div>
                   <div id="shape" class="hidden"><!-- <img src="assets/img/triangle.png" class="m-auto"> --></div>
+                  <div id="success" class="hidden pt-2">
+                    <p>200: OK</p>
+                    <p>The backend is not able to know if the API request was due to a human using the web app or not</p>
+                  </div>
                 </div>
               </div>
-              <div class="mt-10 py-4 border-t border-gray-300">
+              <div class="mt-2 py-2 border-t border-gray-300">
                 <div class="flex flex-wrap justify-center">
-                      <div class="py-4 px-8 mt-0">
-                        <button
-                          id="hello-button"
-                          class="bg-blue-500 active:bg-blue-600 uppercase text-white font-bold hover:shadow-md shadow text-xs px-4 py-2 rounded outline-none focus:outline-none sm:mr-2 mb-1 button-transition"
-                          type="button"
-                        >
-                          Hello
-                        </button>
-                      </div>
+                  <div class="py-4 px-8 mt-0">
+                    <button
+                      id="hello-button"
+                      class="bg-blue-500 active:bg-blue-600 uppercase text-white font-bold hover:shadow-md shadow text-xs px-4 py-2 rounded outline-none focus:outline-none sm:mr-2 mb-1 button-transition"
+                      type="button"
+                    >
+                      Hello
+                    </button>
+                  </div>
 
-                      <div class="py-4 px-8 mt-0">
-                        <button
-                          id="shape-button"
-                          class="bg-blue-500 active:bg-blue-600 uppercase text-white font-bold hover:shadow-md shadow text-xs px-4 py-2 rounded outline-none focus:outline-none sm:mr-2 mb-1"
-                          type="button"
-                        >
-                          Shape
-                        </button>
-                      </div>
+                  <div class="py-4 px-8 mt-0">
+                    <button
+                      id="shape-button"
+                      class="bg-blue-500 active:bg-blue-600 uppercase text-white font-bold hover:shadow-md shadow text-xs px-4 py-2 rounded outline-none focus:outline-none sm:mr-2 mb-1 button-transition"
+                      type="button"
+                    >
+                      Shape
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </section>
+      <section class="relative pb-4">
+        <div class="container mx-auto">
+          <h4 class="text-center">Read this <a class="text-blue-600" href="https://github.com/approoov/web-quickstart-fingerprintjs-javascript">quickstart guide</a> to learn how to integrate FingerprintJS with Approov in a web app</h4>
+        </div>
+      </section>
     </main>
-    <footer class="relative pt-4 pb-2 approov-secondary-background-color">
+    <footer class="relative pt-3 approov-secondary-background-color">
 
       <div class="container mx-auto px-4">
         <div class="flex flex-wrap">
@@ -214,7 +226,7 @@
             </div>
           </div>
           <div class="w-full mt-4 sm:w-4/12 px-0">
-            <div class="flex flex-wrap items-top mb-6">
+            <div class="flex flex-wrap items-top">
               <div class="w-full lg:w-4/12 px-4 ml-auto">
                 <span
                   class="block uppercase text-gray-900 text-sm font-semibold mb-2"

@@ -2,11 +2,13 @@
 
 [Approov](https://approov.io) is an API security solution used to verify that requests received by your API services originate from trusted versions of your apps.
 
-This quickstart is written specifically for web apps making API calls that you wish to protect with the Approov FingerprintJS integration.
+This quickstart is written specifically for web apps making API calls that you wish to protect with the integration of FingerprintJS web protection into the Approov token.
+
+The FingerprintJS web protection is not as strong as the [Approov mobile app attestation](https://approov.io/product) service, but the integration within the Approov token enables the same simple backend token check for both the Approov mobile app attestation and FingerprintJS web protection. After checking the Approov token validity its claims can be used to differentiate between requests protected by the Approov mobile app attestation or by the web protection and react differently when that is necessary. For example, depending on the sensitivity of the data being provided by the endpoint.
 
 The quickstart is agnostic of any web framework, because the simple Javascript functions it relies on are easily ported to any web framework.
 
-This quickstart provides a step-by-step example of integrating Approov with FingerprintJS into a web app using a simple Shapes example that shows a geometric shape based on a request to an API backend that can be protected with Approov.
+This quickstart provides a step-by-step example of integrating FingerprintJS into an Approov token on a web app using a simple Shapes example that shows a geometric shape based on a request to an API backend that can be protected with Approov.
 
 If you are looking for another Approov integration you can check our list of [quickstarts](https://approov.io/docs/latest/approov-integration-examples/backend-api/), and if you don't find what you are looking for, then please let us know [here](https://approov.io/contact).
 
@@ -28,7 +30,7 @@ If you are looking for another Approov integration you can check our list of [qu
 
 ## WHAT YOU WILL NEED
 
-* Access to a trial or paid Approov and FingerprintJS subscription
+* Access to a trial or paid Approov account and FingerprintJS subscription
 * The `approov` command line tool [installed](https://approov.io/docs/latest/approov-installation/) with access to your account
 * A web server or Docker installed.
 * The contents of the folder containing this README
@@ -48,7 +50,7 @@ If you are looking for another Approov integration you can check our list of [qu
 
 ## HOW IT WORKS?
 
-This is a brief overview of how the Approov cloud service and FingerprintJS fit together. For a complete overview of how frontend and backend fit together with the Approov cloud service we recommend to read the [Approov overview](https://approov.io/product) page on our website.
+This is a brief overview of how the Approov cloud service and FingerprintJS fit together. For a complete overview of how frontend and backend fit together with the Approov cloud service we recommend the [Approov overview](https://approov.io/product) page on our website.
 
 ### FingerprintJS
 
@@ -61,17 +63,15 @@ In either case, additional verification steps should be introduced into the flow
 Each API request made by the web app is handled such that:
 
 * A FingerprintJS `visitorId` and `requestId` is fetched via the included FingerprintJS script
-* An attestation request is made to the Approov cloud service with the `visitorId` and `requestId`
-* The Approov token returned from the Approov attestation request is added as an header to the API request
+* A web protection request is made to the Approov cloud service with the `visitorId` and `requestId`
+* The Approov token returned from the Approov web protection request is added as an header to the API request
 * The API request is made as usual by the web app
 
 The API backend will be the one deciding to allow or deny the action the user initiates from the web app. Never put logic in the web app itself to decide when the user is allowed or not to perform the action, because it can be easily bypassed and then the API will be left vulnerable.
 
 ### Approov Cloud Service
 
-The Approov cloud service attests with FingerprintJS cloud service that your web app is indeed being used by a real user in a browser.
-
-The attestation request is handled such that:
+The Approov cloud service checks with FingerprintJS cloud service that your web app is indeed being used by a real user in a browser, and then the web protection request is handled such that:
 
 * If the FingerprintJS check passes then a valid Approov token is returned to the web app
 * If the FingerprintJS check fails then a legitimate looking Approov token will be returned
@@ -188,7 +188,9 @@ Modify the `shapes-app/unprotected/index.html` file to load the FingerprintJS sc
 
 ### Approov FingerprintJS Implementation
 
-Before we start let's see the Javascript code difference between the Approov unprotected and protected Shapes web app:
+If you have any doubt during the next steps you can always refer to the `shapes-app/approov-fingerprintjs-protected/assets/js/app.js` file to compare it with your own changes on the file `shapes-app/unprotected/assets/js/app.js`.
+
+You can easily compare the changes you need to make with this command:
 
 ```text
 git diff --no-index shapes-app/unprotected/assets/js/app.js shapes-app/approov-fingerprintjs-protected/assets/js/app.js
@@ -196,7 +198,7 @@ git diff --no-index shapes-app/unprotected/assets/js/app.js shapes-app/approov-f
 
 As we can see the necessary Javascript code to implement Approov in a web app app is simple and short.
 
-Let's start to implement Approov in the Shapes unprotected app...
+Let's start to implement FingerprintJS with Approov in the Shapes unprotected app...
 
 Modify the file `shapes-app/unprotected/assets/js/app.js` to add this code at the top:
 
@@ -268,12 +270,10 @@ function fetchApproovToken(fingerprintJsData) {
 
 function addRequestHeaders() {
   return fetchFingerprintJsData()
-    .then(fingerprintJsData => {
-      return fetchApproovToken(fingerprintJsData)
-    })
+    .then(fingerprintJsData => fetchApproovToken(fingerprintJsData))
     .then(approovToken => {
       return new Headers({
-        'Api-Key': 'your-api-key-goes-here',
+        'Accept': 'application/json', // fix the default being anything "*/*"
         'Approov-Token': approovToken
       })
     })
@@ -282,14 +282,9 @@ function addRequestHeaders() {
 // function fetchHello() {...}
 ```
 
-After you have updated the file `shapes-app/unprotected/assets/js/app.js` it should look the same as the file `shapes-app/approov-fingerprintjs-protected/assets/js/app.js`. You can check that they are the same with:
+So, the amount of changes made are minimal and are mostly related with replacing the `Recaptcha-Token` header with the `Apptoov-Token` header that has embedded the FingerprintJS result.
 
-```text
-git diff --no-index shapes-app/unprotected/assets/js/app.js shapes-app/approov-fingerprintjs-protected/assets/js/app.js
-```
-> **NOTE:** When files are the same you don't see any output.
-
-Before you run the code you need to obtain the values for the placeholders, and you will learn how to in the next section.
+Before you can run the code it's necessary to obtain the values for the placeholders, and you will learn how to in the next section.
 
 [TOC](#toc-table-of-contents)
 
@@ -325,7 +320,7 @@ Assuming that your browser token is `aaaaa12345`  and the API token is `bbbbb123
 approov web -fingerprintjs -add aaaaa12345 -apiToken bbbbb12345 -region RoW -embedResult
 ```
 
-We add the `-embedResult` flag only when we want to [have access](https://approov.io/docs/latest/approov-usage-documentation/#approov-embed-token-claim-for-fingerprintjs) to the full response from the FingerprintJS request lookup made by the Approov web attester to the FingerprintJS API. In this quickstart we are adding it for debug proposes only.
+We use the `-embedResult` flag only when we want to [have access](https://approov.io/docs/latest/approov-usage-documentation/#approov-embed-token-claim-for-fingerprintjs) to the full response from the FingerprintJS request lookup made by the Approov web attester to the FingerprintJS API. In this quickstart we are adding it for debug proposes only.
 
 ### Replace the Code Placeholders
 
@@ -335,11 +330,20 @@ The code we added for the Approov FingerprintJS integration has some placeholder
 
 #### FingerprintJS Code
 
-Using the browser token retrieved from the FingerprintJS dashboard we can now replace the `___FINGERPRINTJS_BROWSER_TOKEN___` directly in the code or with:
+Using the browser token retrieved from the FingerprintJS dashboard we can now replace the `___FINGERPRINTJS_BROWSER_TOKEN___` directly in the code or from the command line.
+
+On Linux and MACs you can use the `sed` command:
 
 ```text
 sed -i "s|___FINGERPRINTJS_BROWSER_TOKEN___|aaaaa12345|" ./shapes-app/unprotected/assets/js/app.js
 ```
+
+On Windows you can do it with:
+
+```text
+get-content shapes-app\unprotected\index.html | %{$_ -replace "___FINGERPRINTJS_BROWSER_TOKEN___","aaaaa12345"}
+```
+
 > **NOTE:** Replace the dummy browser token `aaaaa12345` with your own one.
 
 #### Approov Site Key
@@ -364,11 +368,20 @@ FingerprintJS:
     Embed Result: true
 ```
 
-Replace the placeholder `___APPROOV_SITE_KEY___` directly in the code or just do it with:
+Now, replace the placeholder `___APPROOV_SITE_KEY___` directly in the code or from the command line.
+
+On Linux and MACs you can use the `sed` command:
 
 ```text
 sed -i "s|___APPROOV_SITE_KEY___|123a4567-abcd-12e3-9z8a-9b1234d54321|" ./shapes-app/unprotected/assets/js/app.js
 ```
+
+On Windows you can do it with:
+
+```text
+get-content shapes-app\unprotected\index.html | %{$_ -replace "___APPROOV_SITE_KEY___","123a4567-abcd-12e3-9z8a-9b1234d54321"}
+```
+
 > **NOTE:** Replace the dummy Approov site key token `123a4567-abcd-12e3-9z8a-9b1234d54321` with your own one.
 
 [TOC](#toc-table-of-contents)
@@ -397,7 +410,7 @@ This can be due to a lot of different causes, but usually is due to a typo, miss
 
 Open the browser developer tools and check if you can see any errors in the console.
 
-If you find errors related with the `app.js` file then fix them and retry again, but always remember to refresh the browser with `ctrl + F5` when updating Javascript.
+If you find errors related with the `app.js` file then fix them and retry again, but always remember to refresh the browser with `ctrl + F5` after updating a Javascript file.
 
 ### FingerprintJS Script
 
@@ -443,17 +456,17 @@ approov metrics
 
 This will open a Grafana dashboard in your browser from where you can see detailed metrics.
 
-### Approov Web Attester Errors
+### Approov Web Protection Server Errors
 
-If something is wrong with your Approov integration, that prevents the Approov web attester to complete the attestation, then an error response will be returned.
+If something is wrong with your FingerprintJS integration, that prevents the Approov web protection to complete the request, then an error response will be returned.
 
-See [here](https://approov.io/docs/latest/approov-usage-documentation/#troubleshooing-web-protection-errors) the complete list of possible errors that can be returned by the Approov web attester.
+See [here](https://approov.io/docs/latest/approov-usage-documentation/#troubleshooting-web-protection-errors) the complete list of possible errors that can be returned by the Approov web protection server.
 
-If the error is not displayed in the web page you may need to open the browser developer tools and inspect the json response payload for the request made to the Approov web attester.
+If the error is not displayed in the web page you may need to open the browser developer tools and inspect the json response payload for the request made to the Approov web protection server.
 
 ### Debug the Approov Token
 
-The Approov CLI allows to check the approov token validity and its claims.
+The Approov CLI can check the Approov token validity and display the claims.
 
 Open the browser developers tools and from the network tab grab the Approov token from the request header `Approov-Token` and then check it with:
 
@@ -498,6 +511,8 @@ Example of the `embed` claim present in an Approov token:
   }
 }
 ```
+
+> **NOTE:** The output of the Approov CLI is not formatted as the above one.
 
 [TOC](#toc-table-of-contents)
 

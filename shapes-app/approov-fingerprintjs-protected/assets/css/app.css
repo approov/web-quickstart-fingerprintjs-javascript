@@ -54,9 +54,5 @@
 }
 
 #profile-section-header {
-    height: 380px;
-}
-
-.button-trnasition {
-    transition: all 0.15s ease 0s;
+    height: 28rem;
 }
