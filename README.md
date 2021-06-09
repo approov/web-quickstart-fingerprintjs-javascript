@@ -220,10 +220,12 @@ const API_DOMAIN = "shapes.approov.io"
 const API_BASE_URL = "https://" + API_DOMAIN
 ```
 
-Modify the file `shapes-app/unprotected/assets/js/app.js` to insert between `const APPROOV_ATTESTER_URL` and `fetchHello()` the following code:
+Modify the file `shapes-app/unprotected/assets/js/app.js` to insert between `const API_BASE_URL` and `makeApiRequest()` the following code:
 
 ```js
-// const APPROOV_ATTESTER_URL = 'https://web-1.approovr.io/attest'
+// const API_BASE_URL = "https://" + API_DOMAIN
+
+const APPROOV_ATTESTER_URL = 'https://web-1.approovr.io/attest'
 
 // Replace the placeholders with your own values
 const APPROOV_SITE_KEY = '___APPROOV_SITE_KEY___'
@@ -276,7 +278,7 @@ function addRequestHeaders() {
     })
 }
 
-// function fetchHello() {...}
+// function makeApiRequest() {...}
 ```
 
 Note that the switch from the FingerprintJS flow to the Approov flow requires only minor changes to the handling of the FingerprintJS data result. We would expect the same small changes to be required in your website at each point you construct requests that include a FingerprintJS token. Depending on how your API calls are constructed, you may be able to isolate the changes to a single point.
