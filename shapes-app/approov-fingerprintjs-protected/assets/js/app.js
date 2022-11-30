@@ -24,11 +24,11 @@ const APPROOV_ATTESTER_DOMAIN = 'web-1.approovr.io'
 // Check the Dockerfile to see how place holders are replaced during the
 // Docker image build.
 const APPROOV_SITE_KEY = '___APPROOV_SITE_KEY___'
-const FINGERPRINTJS_BROWSER_TOKEN = '___FINGERPRINTJS_BROWSER_TOKEN___'
+const FINGERPRINT_BROWSER_TOKEN = '___FINGERPRINTJS_BROWSER_TOKEN___'
 
 function initFingerprintJS() {
   // Initialize an agent at application startup.
-    return FingerprintJS.load({ token: FINGERPRINTJS_BROWSER_TOKEN })
+    return FingerprintJS.load({ token: FINGERPRINT_BROWSER_TOKEN })
 }
 
 function fetchFingerprintJsData() {
@@ -42,7 +42,11 @@ async function fetchToken(api) {
     let approovToken = await Approov.fetchToken(api, {})
     return approovToken
   } catch(error) {
-    await Approov.initializeSession({})
+    await Approov.initializeSession({
+      approovHost: APPROOV_ATTESTER_DOMAIN,
+      approovSiteKey: APPROOV_SITE_KEY,
+      fingerprintBrowserToken: FINGERPRINT_BROWSER_TOKEN,
+    })
     let result = fetchFingerprintJsData()
     let approovToken = await Approov.fetchToken(api, {fingerprintRequest: result})
     return approovToken
