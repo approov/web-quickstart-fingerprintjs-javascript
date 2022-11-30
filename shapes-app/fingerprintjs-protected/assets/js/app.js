@@ -16,11 +16,10 @@ window.addEventListener('load', (event) => {
 const API_VERSION = "v1"
 const API_DOMAIN = "shapes.approov.io"
 const API_BASE_URL = "https://" + API_DOMAIN
-const APPROOV_ATTESTER_URL = 'https://web-1.approovr.io/attest'
+const API_KEY = "yXClypapWNHIifHUWmBIyPFAm"
 
 // Check the Dockerfile to see how place holders are replaced during the
 // Docker image build.
-const APPROOV_SITE_KEY = '___APPROOV_SITE_KEY___'
 const FINGERPRINTJS_BROWSER_TOKEN = '___FINGERPRINTJS_BROWSER_TOKEN___'
 
 function initFingerprintJS() {
@@ -39,6 +38,7 @@ function addRequestHeaders() {
     .then(fingerprintJsToken => {
       return new Headers({
         'Accept': 'application/json', // fix the default being anything "*/*"
+        'Api-Key': API_KEY,
         'FingerprintJS-Token': fingerprintJsToken
       })
     })
