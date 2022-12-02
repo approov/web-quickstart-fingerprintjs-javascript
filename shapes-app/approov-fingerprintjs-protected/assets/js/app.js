@@ -1,3 +1,5 @@
+// See the Dockerfile for how place holders in config.js are replaced during the Docker image build.
+import { APPROOV_ATTESTER_DOMAIN, SHAPES_API_KEY, APPROOV_SITE_KEY, FINGERPRINT_BROWSER_TOKEN } from "/config.js"
 import { Approov, ApproovError, ApproovFetchError, ApproovServiceError, ApproovSessionError } from "./approov.js"
 
 let fpPromise
@@ -18,25 +20,20 @@ window.addEventListener('load', (event) => {
 const API_VERSION = "v2"
 const API_DOMAIN = "shapes.approov.io"
 const API_BASE_URL = "https://" + API_DOMAIN
-const API_KEY = "yXClypapWNHIifHUWmBIyPFAm"
-const APPROOV_ATTESTER_DOMAIN = 'web-1.approovr.io'
-
-// Check the Dockerfile to see how place holders are replaced during the
-// Docker image build.
-const APPROOV_SITE_KEY = '___APPROOV_SITE_KEY___'
-const FINGERPRINT_BROWSER_TOKEN = '___FINGERPRINTJS_BROWSER_TOKEN___'
 
 function initFingerprintJS() {
-  // Initialize an agent at application startup.
-    return FingerprintJS.load({ token: FINGERPRINT_BROWSER_TOKEN })
+  // Initialize the Fingerprint agent
+  const fpPromise = import('https://fpjscdn.net/v3/' + FINGERPRINT_BROWSER_TOKEN)
+    .then(FingerprintJS => FingerprintJS.load())
+  return fpPromise
 }
 
-function fetchFingerprintJsData() {
-  // Get the visitor identifier when you need it.
+function getFingerprintData() {
+  // Get the Fingerprint visitor identifier
   return fpPromise.then(fp => fp.get())
 }
 
-async function fetchToken(api) {
+async function fetchApproovToken(api) {
   try {
     Approov.defaultAPI = api
     let approovToken = await Approov.fetchToken(api, {})
@@ -47,7 +44,8 @@ async function fetchToken(api) {
       approovSiteKey: APPROOV_SITE_KEY,
       fingerprintBrowserToken: FINGERPRINT_BROWSER_TOKEN,
     })
-    let result = fetchFingerprintJsData()
+    let result = await getFingerprintData()
+    console.log('fpResult: ' + JSON.stringify(result))
     let approovToken = await Approov.fetchToken(api, {fingerprintRequest: result})
     return approovToken
   }
@@ -56,10 +54,10 @@ async function fetchToken(api) {
 async function addRequestHeaders() {
   let headers = new Headers({
     'Accept': 'application/json', // fix the default being anything "*/*"
-    'Api-Key': API_KEY,
+    'Api-Key': SHAPES_API_KEY,
   })
   try {
-    let approovToken = await fetchToken(API_DOMAIN)
+    let approovToken = await fetchApproovToken(API_DOMAIN)
     console.log('Approov token: ' + JSON.stringify(approovToken))
     headers.append('Approov-Token', approovToken)
   } catch(error) {
