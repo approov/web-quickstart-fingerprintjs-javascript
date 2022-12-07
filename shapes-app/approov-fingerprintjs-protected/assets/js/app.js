@@ -14,14 +14,14 @@ window.addEventListener('load', (event) => {
   const shapeButton = document.getElementById('shape-button')
   shapeButton.addEventListener('click', (event) => fetchShape())
 
-  fpPromise = initFingerprintJS()
+  fpPromise = initFingerprint()
 })
 
 const API_VERSION = "v2"
 const API_DOMAIN = "shapes.approov.io"
 const API_BASE_URL = "https://" + API_DOMAIN
 
-function initFingerprintJS() {
+function initFingerprint() {
   // Initialize the Fingerprint agent
   const fpPromise = import('https://fpjscdn.net/v3/' + FINGERPRINT_BROWSER_TOKEN)
     .then(FingerprintJS => FingerprintJS.load())
@@ -35,7 +35,6 @@ function getFingerprintData() {
 
 async function fetchApproovToken(api) {
   try {
-    Approov.defaultAPI = api
     let approovToken = await Approov.fetchToken(api, {})
     return approovToken
   } catch(error) {
@@ -45,7 +44,7 @@ async function fetchApproovToken(api) {
       fingerprintBrowserToken: FINGERPRINT_BROWSER_TOKEN,
     })
     let result = await getFingerprintData()
-    console.log('fpResult: ' + JSON.stringify(result))
+    console.log('Fingerprint result: ' + JSON.stringify(result))
     let approovToken = await Approov.fetchToken(api, {fingerprintRequest: result})
     return approovToken
   }

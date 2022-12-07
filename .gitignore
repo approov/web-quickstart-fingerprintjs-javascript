@@ -4,6 +4,6 @@ config.js
 approov.dev.js
 approov.dev.js.map
 approov.js
-shapes-app/approov-fingerprintjs-protected/assets/src/index.ts
+shapes-app/approov-fingerprint-protected/assets/src/index.ts
 
 .DS_Store
