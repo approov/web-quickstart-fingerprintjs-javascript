@@ -1,4 +1,4 @@
-// See the Dockerfile for how place holders in config.js are replaced during the Docker image build.
+
 import { SHAPES_API_KEY, FINGERPRINT_BROWSER_TOKEN } from "/config.js"
 
 let fpPromise

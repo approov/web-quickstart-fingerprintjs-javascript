@@ -1,10 +1,4 @@
-# Approov Web QuickStart: Fingerprint - Javascript
-
-[Approov](https://approov.io) is an API security solution used to verify that requests received by your API services originate from trusted versions of your apps. The core Approov product is targeted at mobile apps, however, we provide several integrations with 3rd party web protection solutions so that a single back-end Approov check can be used to authorize API access. This quickstart shows how to use the integration with Fingerprint to add Approov tokens to your API calls.
-
-[Fingerprint](https://fingerprintjs.com/) provides a powerful mechanism for fingerprinting the browser environment of a user and deriving a visitor ID based on both the raw fingerprint and the history of prior visits. This visitor ID can then be compared against a user identity in the backend system to determine if they match. If they do, then there is a high probability that it is indeed the correct user and operations can proceed. If not, then this may indicate an attempt at account takeover or simply that the user has moved to a different browser environment. In either case, additional verification steps should be introduced into the flow to protect the user’s account.
-
-Note that, Fingerprint web protection does not solve the same issue as [Approov mobile app attestation](https://approov.io/product) which provides a very strong indication that a request can be trusted. However, for APIs that are used by both the mobile and web channels, a single check to grant access, simplifies the overall implementation of authorization decisions. Approov's integration with Fingerprint requires that the backend first check that an Approov token is present and that it is correctly signed. Subsequently, the token claims can be read to differentiate between requests coming from the mobile or web channels and to apply any associated restrictions. If required, the full response from the Fingerprint check can be embedded in the Approov token to be used by that logic. We still recommend that you restrict critical API endpoints to only work from the Mobile App.
+# Shapes Example
 
 This quickstart provides a step-by-step guide to integrating Fingerprint with Approov in a web app using a simple demo API backend for obtaining a random shape. The integration uses plain Javascript without using any libraries or SDKs except those providing the Fingerprint integration. As such, you should be able to use it directly or easily port it to your preferred web framework or library.
 
@@ -126,13 +120,13 @@ Now visit http://localhost:8000 and you should be able to see:
 
 Now that you have completed the deployment of the web app with one of your preferred web servers it is time to see how it works.
 
-In the home page you can see three buttons. Click in the `UNPROTECTED` button to see the unprotected Shapes web app:
+In the home page you can see three buttons. Click the `UNPROTECTED` button to see the unprotected Shapes web app:
 
 <p>
   <img src="/readme-images/unprotected-homepage.png" width="480" title="Shapes unprotected web app home page">
 </p>
 
-Click on the `HELLO` button and you should see this:
+Click the `HELLO` button and you should see this:
 
 <p>
   <img src="/readme-images/unprotected-hello-page.png" width="480" title="Shapes unprotected web app hello page">
@@ -156,7 +150,7 @@ First, to simulate the web app working with an API endpoint protected with Appro
 const API_VERSION = "v2"
 ```
 
-Now save the file and do a hard refresh in your browser with `ctrl + F5`, then hit the `SHAPE` button again and you should see this:
+Now save the file and do a hard refresh in your browser (`Ctrl + F5` on Windows or Linux, or `Command + Shift + R` on Mac), then hit the `SHAPE` button again and you should see this:
 
 <p>
   <img src="/readme-images/unprotected-v2-shape-page.png" width="480" title="Shapes unprotected web app V2 shape page">
@@ -228,35 +222,43 @@ function initFingerprint() {
 }
 
 function getFingerprintData() {
-  // Get the Fingerprint visitor identifier
+  // Get the Fingerprint visitor identifier and request ID
   return fpPromise.then(fp => fp.get())
 }
 
 async function fetchApproovToken(api) {
   try {
+    // Try to fetch an Approov token
     let approovToken = await Approov.fetchToken(api, {})
     return approovToken
-  } catch(error) {
-    await Approov.initializeSession({
-      approovHost: APPROOV_ATTESTER_DOMAIN,
-      approovSiteKey: APPROOV_SITE_KEY,
-      fingerprintBrowserToken: FINGERPRINT_BROWSER_TOKEN,
-    })
-    let result = await getFingerprintData()
-    let approovToken = await Approov.fetchToken(api, {fingerprintRequest: result})
-    return approovToken
+  } catch (error) {
+    // If Approov has not been initialized or the Approov session has expired, initialize and start a new one
+    if (error instanceof ApproovSessionError) {
+      await Approov.initializeSession({
+        approovHost: APPROOV_ATTESTER_DOMAIN,
+        approovSiteKey: APPROOV_SITE_KEY,
+        fingerprintBrowserToken: FINGERPRINT_BROWSER_TOKEN,
+      })
+      // Get a fresh Fingerprint result
+      let result = await getFingerprintData()
+      // Fetch the Approov token
+      let approovToken = await Approov.fetchToken(api, {fingerprintRequest: result})
+      return approovToken
+    } else {
+      throw error
+    }
   }
 }
 
 async function addRequestHeaders() {
   let headers = new Headers({
-    'Accept': 'application/json', // fix the default being anything "*/*"
+    'Accept': 'application/json',
     'Api-Key': SHAPES_API_KEY,
   })
   try {
     let approovToken = await fetchApproovToken(API_DOMAIN)
     headers.append('Approov-Token', approovToken)
-  } catch(error) {
+  } catch (error) {
     console.log(JSON.stringify(error))
   }
   return headers
@@ -360,7 +362,7 @@ get-content shapes-app\unprotected\index.html | %{$_ -replace "___APPROOV_SITE_K
 
 Now, that we have completed the Approov Fingerprint integration into the unprotected Shapes web app it is time to test it again.
 
-Reload the page in the browser (`ctrl + F5` on Windows or Linux, or `command + R` on Mac) and then click in the `SHAPES` button and this time, instead of a bad request, we should get a shape:
+Reload the page in the browser (`Ctrl + F5` on Windows or Linux, or `Command + Shift + R` on Mac) and then click the `SHAPES` button and this time, instead of a bad request, we should get a shape:
 
 <p>
   <img src="/readme-images/protected-v2-shape-page.png" width="480" title="Shapes protected web app Shape page">

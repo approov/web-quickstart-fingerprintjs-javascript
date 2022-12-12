@@ -1,4 +1,4 @@
-// See the Dockerfile for how place holders in config.js are replaced during the Docker image build.
+
 import { APPROOV_ATTESTER_DOMAIN, SHAPES_API_KEY, APPROOV_SITE_KEY, FINGERPRINT_BROWSER_TOKEN } from "/config.js"
 import { Approov, ApproovError, ApproovFetchError, ApproovServiceError, ApproovSessionError } from "./approov.js"
 
@@ -29,24 +29,31 @@ function initFingerprint() {
 }
 
 function getFingerprintData() {
-  // Get the Fingerprint visitor identifier
+  // Get the Fingerprint visitor identifier and request ID
   return fpPromise.then(fp => fp.get())
 }
 
 async function fetchApproovToken(api) {
   try {
+    // Try to fetch an Approov token
     let approovToken = await Approov.fetchToken(api, {})
     return approovToken
-  } catch(error) {
-    await Approov.initializeSession({
-      approovHost: APPROOV_ATTESTER_DOMAIN,
-      approovSiteKey: APPROOV_SITE_KEY,
-      fingerprintBrowserToken: FINGERPRINT_BROWSER_TOKEN,
-    })
-    let result = await getFingerprintData()
-    console.log('Fingerprint result: ' + JSON.stringify(result))
-    let approovToken = await Approov.fetchToken(api, {fingerprintRequest: result})
-    return approovToken
+  } catch (error) {
+    if (error instanceof ApproovSessionError) {
+      // If Approov has not been initialized or the Approov session has expired, initialize and start a new one
+      await Approov.initializeSession({
+        approovHost: APPROOV_ATTESTER_DOMAIN,
+        approovSiteKey: APPROOV_SITE_KEY,
+        fingerprintBrowserToken: FINGERPRINT_BROWSER_TOKEN,
+      })
+      // Get a fresh Fingerprint result
+      let result = await getFingerprintData()
+      // Fetch the Approov token
+      let approovToken = await Approov.fetchToken(api, {fingerprintRequest: result})
+      return approovToken
+    } else {
+      throw error
+    }
   }
 }
 
@@ -57,9 +64,8 @@ async function addRequestHeaders() {
   })
   try {
     let approovToken = await fetchApproovToken(API_DOMAIN)
-    console.log('Approov token: ' + JSON.stringify(approovToken))
     headers.append('Approov-Token', approovToken)
-  } catch(error) {
+  } catch (error) {
     console.log(JSON.stringify(error))
   }
   return headers
