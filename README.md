@@ -91,7 +91,6 @@ To actually protect your APIs there are some further steps:
 * The Approov service needs to be set up to provide tokens for your API.
 * Your API server needs to perform an Approov token check in addition to the steps in this frontend guide. Various [Backend API Quickstarts](https://approov.io/resource/quickstarts/#backend-api-quickstarts) are available to suit your particular situation depending on the backend technology used.
 * Any Fingerprint visitor ID check in your API server needs to be converted to use the embedded Fingerprint result contained in the Approov token. The Approov service performs the call to the Fingerprint service to obtain the result, so your API backend does not need to.
-- TODO: same for other wrapped services.
 
 ## APPROOV SERVICE SETUP
 
@@ -126,6 +125,32 @@ The Approov CLI can check Approov token validity and display the claims. Open th
 ```text
 approov token -check your-Approov-token
 ```
+
+## OTHER CONSIDERATIONS
+
+When adding Approov with Fingerprint into your own web app you may want to address some of the following points:
+
+### API Domains
+
+Remember to do an audit of your API to check which end-points should be enabled for web access. When necessary, extend the backend token check to differentiate between mobile app and web app tokens and use that to restrict the access to more sensitive end-points. Once the backend is ready, enable the Approov web protection by adding the `-allowWeb` flag whenever you [register or re-register](https://approov.io/docs/latest/approov-web-protection-integration/#enable-web-protection-for-an-api) an API with the Approov CLI.
+
+### Changing Your API Backend
+
+The Shapes example app uses the API endpoint `https://shapes.approov.io/v3/shapes` hosted on Approov's servers. You can find the code for it in this [Github repo](https://github.com/approov/quickstart-nodejs-koa_shapes-api).
+
+If you want to integrate Approov into your own web app you will need to [integrate](https://approov.io/docs/latest/approov-usage-documentation/#backend-integration) an Approov token check in the backend. Since the Approov token is simply a standard [JWT](https://en.wikipedia.org/wiki/JSON_Web_Token) this is usually straightforward.
+
+Check the [Backend API Quickstarts](https://approov.io/resource/quickstarts/#backend-api-quickstarts) examples that provide a detailed walk-through for specific programming languages and frameworks.
+
+### Content Security Policy
+
+In the `content-src` policy of your current web app you will need to add the domains for Approov and Fingerprint APIs:
+
+```
+connect-src https://your-domains.com https://web-1.approovr.io/ https://api.sjpf.io/ https://api.fpjs.io/;
+```
+
+You can check the Content Security Policy for your site [here](https://csp-evaluator.withgoogle.com/) or test it in conjunction with all the other security headers [here](https://securityheaders.com).
 
 ## FURTHER OPTIONS
 

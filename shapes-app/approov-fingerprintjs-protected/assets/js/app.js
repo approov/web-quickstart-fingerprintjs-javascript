@@ -17,7 +17,7 @@ window.addEventListener('load', (event) => {
   fpPromise = initFingerprint()
 })
 
-const API_VERSION = "v2"
+const API_VERSION = "v3"
 const API_DOMAIN = "shapes.approov.io"
 const API_BASE_URL = "https://" + API_DOMAIN
 
