@@ -17,17 +17,17 @@ This quickstart uses a static web app and so you can use any web server to run i
 
 ### Starting the Web Server
 
-If you have no other preference then please choose from one of the following options.
+If you have no other preference then please choose from one of the following options:
 
 #### Docker
 
-From the root of the quickstart run:
+Copy the file `.env.example` to `.env` and then build the Docker image and start a container. In a shell, from the root of the quickstart run:
 
 ```txt
+cp .env.example .env
+sudo docker network create traefik
 sudo docker-compose up local
 ```
-
-This will first build the docker image and then start a container with it.
 
 #### Python
 
@@ -194,7 +194,7 @@ async function addRequestHeaders() {
     let approovToken = await fetchApproovToken(API_DOMAIN)
     headers.append('Approov-Token', approovToken)
   } catch (error) {
-    console.log(JSON.stringify(error))
+    console.error(error)
   }
   return headers
 }
