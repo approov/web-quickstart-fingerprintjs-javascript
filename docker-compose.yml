@@ -6,9 +6,6 @@ services:
   local:
     build:
       context: .
-      args:
-        APPROOV_SITE_KEY: "${APPROOV_SITE_KEY}"
-        FINGERPRINT_BROWSER_TOKEN: "${FINGERPRINT_BROWSER_TOKEN}"
     image: ${DOCKER_IMAGE? Missing env var for DOCKER_IMAGE}
     volumes:
       - ./nginx/nginx-behind-traefik.conf:/etc/nginx/nginx.conf
@@ -23,9 +20,6 @@ services:
   dev:
     build:
       context: .
-      args:
-        APPROOV_SITE_KEY: "${APPROOV_SITE_KEY}"
-        FINGERPRINT_BROWSER_TOKEN: "${FINGERPRINT_BROWSER_TOKEN}"
     image: ${DOCKER_IMAGE? Missing env var for DOCKER_IMAGE}
     volumes:
       - ./nginx/nginx-behind-traefik.conf:/etc/nginx/nginx.conf
@@ -45,9 +39,6 @@ services:
   prod:
     build:
       context: .
-      args:
-        APPROOV_SITE_KEY: "${APPROOV_SITE_KEY}"
-        FINGERPRINT_BROWSER_TOKEN: "${FINGERPRINT_BROWSER_TOKEN}"
     image: ${DOCKER_IMAGE? Missing env var for DOCKER_IMAGE}
     restart: unless-stopped
     networks:
