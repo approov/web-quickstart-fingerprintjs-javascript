@@ -1,6 +1,6 @@
 {
-  "name": "Approov FingerprintJS Qucikstart",
-  "short_name": "Approov FingerprintJS",
+  "name": "Approov Fingerprint Quickstart",
+  "short_name": "Approov Fingerprint",
   "theme_color": "#fff",
   "background_color": "#fff",
   "display": "standalone",

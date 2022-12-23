@@ -1,3 +1,7 @@
+
+import { APPROOV_ATTESTER_DOMAIN, SHAPES_API_KEY, APPROOV_SITE_KEY, FINGERPRINT_BROWSER_TOKEN } from "/config.js"
+import { Approov, ApproovError, ApproovFetchError, ApproovServiceError, ApproovSessionError } from "./approov.js"
+
 let fpPromise
 
 window.addEventListener('load', (event) => {
@@ -10,64 +14,61 @@ window.addEventListener('load', (event) => {
   const shapeButton = document.getElementById('shape-button')
   shapeButton.addEventListener('click', (event) => fetchShape())
 
-  fpPromise = initFingerprintJS()
+  fpPromise = initFingerprint()
 })
 
-const API_VERSION = "v2"
+const API_VERSION = "v3"
 const API_DOMAIN = "shapes.approov.io"
 const API_BASE_URL = "https://" + API_DOMAIN
-const APPROOV_ATTESTER_URL = 'https://web-1.approovr.io/attest'
 
-// Check the Dockerfile to see how place holders are replaced during the
-// Docker image build.
-const APPROOV_SITE_KEY = '___APPROOV_SITE_KEY___'
-const FINGERPRINTJS_BROWSER_TOKEN = '___FINGERPRINTJS_BROWSER_TOKEN___'
-
-function initFingerprintJS() {
-  // Initialize an agent at application startup.
-  return FingerprintJS.load({ token: FINGERPRINTJS_BROWSER_TOKEN })
+function initFingerprint() {
+  // Initialize the Fingerprint agent
+  const fpPromise = import('https://fpjscdn.net/v3/' + FINGERPRINT_BROWSER_TOKEN)
+    .then(FingerprintJS => FingerprintJS.load())
+  return fpPromise
 }
 
-function fetchFingerprintJsData() {
-  // Get the visitor identifier when you need it.
+function getFingerprintData() {
+  // Get the Fingerprint visitor identifier and request ID
   return fpPromise.then(fp => fp.get())
 }
 
-// The Fingerprint token needs to be retrieved each time we want to make a
-// API request with an Approov Token.
-function fetchApproovToken(fingerprintJsData) {
-  const params = new URLSearchParams()
-
-  // Add it like `example.com` not as `https://example.com`.
-  params.append('api', API_DOMAIN)
-  params.append('fingerprintjs-visitor-id', fingerprintJsData.visitorId)
-  params.append('fingerprintjs-request-id', fingerprintJsData.requestId)
-  params.append('approov-site-key', APPROOV_SITE_KEY)
-  params.append('fingerprintjs-token', FINGERPRINTJS_BROWSER_TOKEN)
-
-  return fetch(APPROOV_ATTESTER_URL, {
-      method: 'POST',
-      body: params
-    })
-    .then(response => {
-      if (!response.ok) {
-        console.debug('Approov token fetch failed: ', response)
-        throw new Error('Failed to fetch an Approov Token') // reject with a throw on failure
-      }
-
-      return response.text() // return the token on success
-    })
+async function fetchApproovToken(api) {
+  try {
+    // Try to fetch an Approov token
+    let approovToken = await Approov.fetchToken(api, {})
+    return approovToken
+  } catch (error) {
+    if (error instanceof ApproovSessionError) {
+      // If Approov has not been initialized or the Approov session has expired, initialize and start a new one
+      await Approov.initializeSession({
+        approovHost: APPROOV_ATTESTER_DOMAIN,
+        approovSiteKey: APPROOV_SITE_KEY,
+        fingerprintBrowserToken: FINGERPRINT_BROWSER_TOKEN,
+      })
+      // Get a fresh Fingerprint result
+      let result = await getFingerprintData()
+      // Fetch the Approov token
+      let approovToken = await Approov.fetchToken(api, {fingerprintRequest: result})
+      return approovToken
+    } else {
+      throw error
+    }
+  }
 }
 
-function addRequestHeaders() {
-  return fetchFingerprintJsData()
-    .then(fingerprintJsData => fetchApproovToken(fingerprintJsData))
-    .then(approovToken => {
-      return new Headers({
-        'Accept': 'application/json', // fix the default being anything "*/*"
-        'Approov-Token': approovToken
-      })
-    })
+async function addRequestHeaders() {
+  let headers = new Headers({
+    'Accept': 'application/json', // fix the default being anything "*/*"
+    'Api-Key': SHAPES_API_KEY,
+  })
+  try {
+    let approovToken = await fetchApproovToken(API_DOMAIN)
+    headers.append('Approov-Token', approovToken)
+  } catch (error) {
+    console.error(error)
+  }
+  return headers
 }
 
 function makeApiRequest(path) {

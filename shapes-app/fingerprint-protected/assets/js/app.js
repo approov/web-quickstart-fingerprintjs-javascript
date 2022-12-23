@@ -1,3 +1,6 @@
+
+import { SHAPES_API_KEY, FINGERPRINT_BROWSER_TOKEN } from "/config.js"
+
 let fpPromise
 
 window.addEventListener('load', (event) => {
@@ -10,35 +13,30 @@ window.addEventListener('load', (event) => {
   const shapeButton = document.getElementById('shape-button')
   shapeButton.addEventListener('click', (event) => fetchShape())
 
-  fpPromise = initFingerprintJS()
+  fpPromise = initFingerprint()
 })
 
 const API_VERSION = "v1"
 const API_DOMAIN = "shapes.approov.io"
 const API_BASE_URL = "https://" + API_DOMAIN
-const APPROOV_ATTESTER_URL = 'https://web-1.approovr.io/attest'
 
-// Check the Dockerfile to see how place holders are replaced during the
-// Docker image build.
-const APPROOV_SITE_KEY = '___APPROOV_SITE_KEY___'
-const FINGERPRINTJS_BROWSER_TOKEN = '___FINGERPRINTJS_BROWSER_TOKEN___'
-
-function initFingerprintJS() {
-  // Initialize an agent at application startup.
-  return FingerprintJS.load({ token: FINGERPRINTJS_BROWSER_TOKEN })
+function initFingerprint() {
+  // Initialize the agent at application startup
+  return FingerprintJS.load({ token: FINGERPRINT_BROWSER_TOKEN })
 }
 
-function fetchFingerprintJsData() {
-  // Get the visitor identifier when you need it.
+function getFingerprintData() {
+  // Get the visitor identifier
   return fpPromise.then(fp => fp.get())
 }
 
 function addRequestHeaders() {
-  return fetchFingerprintJsData()
+  return getFingerprintData()
     .then(fingerprintJsData => btoa(JSON.stringify(fingerprintJsData)))
     .then(fingerprintJsToken => {
       return new Headers({
         'Accept': 'application/json', // fix the default being anything "*/*"
+        'Api-Key': SHAPES_API_KEY,
         'FingerprintJS-Token': fingerprintJsToken
       })
     })

@@ -1,0 +1,11 @@
+// Approov service web attester domain
+export const APPROOV_ATTESTER_DOMAIN = 'web-1.approovr.io'
+
+// Approov Shapes example API key
+export const SHAPES_API_KEY = "yXClypapWNHIifHUWmBIyPFAm"
+
+// Approov web site key
+export const APPROOV_SITE_KEY = '___APPROOV_SITE_KEY___'
+
+// Fingerprint browser token
+export const FINGERPRINT_BROWSER_TOKEN = '___FINGERPRINT_BROWSER_TOKEN___'
