@@ -1,5 +1,5 @@
 
-import { SHAPES_API_KEY, FINGERPRINT_BROWSER_TOKEN } from "/config.js"
+import { SHAPES_API_KEY, FINGERPRINT_PUBLIC_API_KEY } from "/config.js"
 
 let fpPromise
 
@@ -22,7 +22,7 @@ const API_BASE_URL = "https://" + API_DOMAIN
 
 function initFingerprint() {
   // Initialize the agent at application startup
-  return FingerprintJS.load({ token: FINGERPRINT_BROWSER_TOKEN })
+  return FingerprintJS.load({ token: FINGERPRINT_PUBLIC_API_KEY })
 }
 
 function getFingerprintData() {

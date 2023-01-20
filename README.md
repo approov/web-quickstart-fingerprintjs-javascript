@@ -42,12 +42,12 @@ async function fetchApproovToken(api) {
       await Approov.initializeSession({
         approovHost: 'web-1.approovr.io',
         approovSiteKey: 'your-Approov-site-key',
-        fingerprintBrowserToken: 'your-Fingerprint-browser-token',
+        fingerprintPublicAPIKey: 'your-Fingerprint-public-API-key',
       })
       // Get a fresh Fingerprint result
       let result = await fpPromise.then(fp => fp.get())
       // Fetch the Approov token
-      let approovToken = await Approov.fetchToken(api, {fingerprintRequest: result})
+      let approovToken = await Approov.fetchToken(api, {fingerprintIDResult: result})
       return approovToken
     } else {
       throw error
@@ -56,7 +56,7 @@ async function fetchApproovToken(api) {
 }
 ```
 
-Customize the function using your Approov site key and Fingerprint browser token to replace `'your-Approov-site-key'` and `'your-Fingerprint-browser-token'`, respectively.
+Customize the function using your Approov site key and Fingerprint public API key to replace `'your-Approov-site-key'` and `'your-Fingerprint-public-API-key'`, respectively.
 
 Finally, modify the location in your code that generates the request headers to include an Approov token, for example change your function that includes a Fingerprint token in the headers, to fetch and include an Approov token instead:
 
@@ -112,13 +112,13 @@ approov api -add your.domain -allowWeb
 
 ### ADDING A FINGERPRINT SUBSCRIPTION
 
-A Fingerprint subscription can be added by specifying the subscription region and by providing a valid browser and API token. The following command adds a subscription in the Rest-of-the-World (RoW) region leaving all other settings at their default values:
+A Fingerprint subscription can be added by specifying the subscription region and by providing a valid public API key and secret API key. The following command adds a subscription in the Rest-of-the-World (RoW) region leaving all other settings at their default values:
 
 ```
-approov web -fingerprint -add your-Fingerprint-browser-token -apiToken your-Fingerprint-API-token> -region RoW
+approov web -fingerprint -add your-Fingerprint-public-API-key -secret your-Fingerprint-secret-API-key> -region RoW
 ```
 
-To change a subscription you simply add it again with all the properties required for the changed subscription. Each addition of the same browser token completely overwrites the previously stored entry.
+To change a subscription you simply add it again with all the properties required for the changed subscription. Each addition of the same public API key completely overwrites the previously stored entry.
 
 You are now set up to request and receive Approov tokens.
 
@@ -168,7 +168,7 @@ If want to use [Token Binding](https://approov.io/docs/latest/approov-web-protec
 
 ```js
 const payload = new TextEncoder().encode(data)
-Approov.fetchToken(api, {fingerprintRequest: result, payload: payload}))
+Approov.fetchToken(api, {fingerprintIDResult: result, payload: payload}))
 ```
 
 This results in the SHA-256 hash of the passed data to be included as the `pay` claim in any Approov tokens issued until a new value for the payload is passed to a call to `Approov.fetchToken`. Note that you should select a value that does not typically change from request to request, as each change requires a new Approov token to be fetched.

@@ -134,7 +134,7 @@ Modify the `shapes-app/unprotected/index.html` file to load the Approov web SDK 
 Modify the file `shapes-app/unprotected/assets/js/app.js` to import Approov and the configuration and declare the `fpPromise` variable at the top of the file:
 
 ```js
-import { APPROOV_ATTESTER_DOMAIN, SHAPES_API_KEY, APPROOV_SITE_KEY, FINGERPRINT_BROWSER_TOKEN } from "/config.js"
+import { APPROOV_ATTESTER_DOMAIN, SHAPES_API_KEY, APPROOV_SITE_KEY, FINGERPRINT_PUBLIC_API_KEY } from "/config.js"
 import { Approov, ApproovError, ApproovFetchError, ApproovServiceError, ApproovSessionError } from "./approov.js"
 
 let fpPromise
@@ -156,7 +156,7 @@ Lastly, add the code to perform the Fingerprint and Approov calls. The following
 ```js
 function initFingerprint() {
   // Initialize the Fingerprint agent
-  const fpPromise = import('https://fpjscdn.net/v3/' + FINGERPRINT_BROWSER_TOKEN)
+  const fpPromise = import('https://fpjscdn.net/v3/' + FINGERPRINT_PUBLIC_API_KEY)
     .then(FingerprintJS => FingerprintJS.load())
   return fpPromise
 }
@@ -177,12 +177,12 @@ async function fetchApproovToken(api) {
       await Approov.initializeSession({
         approovHost: APPROOV_ATTESTER_DOMAIN,
         approovSiteKey: APPROOV_SITE_KEY,
-        fingerprintBrowserToken: FINGERPRINT_BROWSER_TOKEN,
+        fingerprintPublicAPIKey: FINGERPRINT_PUBLIC_API_KEY,
       })
       // Get a fresh Fingerprint result
       let result = await getFingerprintData()
       // Fetch the Approov token
-      let approovToken = await Approov.fetchToken(api, {fingerprintRequest: result})
+      let approovToken = await Approov.fetchToken(api, {fingerprintIDResult: result})
       return approovToken
     } else {
       throw error
@@ -223,37 +223,37 @@ approov api -add shapes.approov.io -allowWeb
 
 ### Configure Approov with a Fingerprint Subscription
 
-To [configure](https://approov.io/docs/latest/approov-web-protection-integration/#configure-approov-with-a-fingerprint-subscription) Approov with a Fingerprint subscription, [signup here](https://dashboard.fingerprintjs.com/signup/), you must first create it using their [dashboard](https://dashboard.fingerprintjs.com). Copy the browser and API tokens from your subscription into the Approov configuration command below.
+To [configure](https://approov.io/docs/latest/approov-web-protection-integration/#configure-approov-with-a-fingerprint-subscription) Approov with a Fingerprint subscription, [signup here](https://dashboard.fingerprintjs.com/signup/), you must first create it using their [dashboard](https://dashboard.fingerprintjs.com). Copy the public API key and private API key from your subscription into the Approov configuration command below.
 
-If your site key and API key were `your-Fingerprint-browser-token` and `your-Fingerprint-API-token`, respectively, then the command to register it with Approov would look like this:
+If your public API key and private API key were `your-Fingerprint-public-API-key` and `your-Fingerprint-secret-API-key`, respectively, then the command to register it with Approov would look like this:
 
 ```text
-approov web -fingerprint -add your-Fingerprint-browser-token -apiToken your-Fingerprint-API-token -region RoW
+approov web -fingerprint -add your-Fingerprint-public-API-key -secret your-Fingerprint-secret-API-key -region RoW
 ```
 
 When the Fingerprint token is passed to an Approov web-protection server for verification it, in turn, calls out to the Fingerprint servers before performing its checks on the result. Approov checks that the provided `requestId` is associated with the `visitorId` and that it was issued within an acceptable time. Further command line options can be used to configure how Approov handles Fingerprint verification, including adjustments to the acceptable time constraints.
 
 ### Replace the Placeholders in the Configuration File
 
-To begin, copy the file `shapes-app/config.js.example` to `shapes-app/config.js` so you can edit the placeholders in `config.js` to include your Approov site key and Fingerprint browser token.
+To begin, copy the file `shapes-app/config.js.example` to `shapes-app/config.js` so you can edit the placeholders in `config.js` to include your Approov site key and Fingerprint public API key.
 
-#### Fingerprint Browser Token
+#### Fingerprint Public API Key
 
-Using the browser token retrieved from the Fingerprint dashboard we can now replace the `___FINGERPRINT_BROWSER_TOKEN___` directly in the configuration file, `config.js`, or from the command line.
+Using the public API key retrieved from the Fingerprint dashboard we can now replace the `___FINGERPRINT_PUBLIC_API_KEY___` directly in the configuration file, `config.js`, or from the command line.
 
 On Linux and MACs you can use the `sed` command:
 
 ```text
-sed -i "s|___FINGERPRINT_BROWSER_TOKEN___|your-Fingerprint-browser-token|" ./shapes-app/config.js
+sed -i "s|___FINGERPRINT_PUBLIC_API_KEY___|your-Fingerprint-public-API-key|" ./shapes-app/config.js
 ```
 
 On Windows you can use:
 
 ```text
-get-content shapes-app\config.js | %{$_ -replace "___FINGERPRINT_BROWSER_TOKEN___","your-Fingerprint-browser-token"}
+get-content shapes-app\config.js | %{$_ -replace "___FINGERPRINT_PUBLIC_API_KEY___","your-Fingerprint-public-API-key"}
 ```
 
-> **NOTE:** Replace the Fingerprint browser token `your-Fingerprint-browser-token` with your own one in the above commands.
+> **NOTE:** Replace the Fingerprint public API key `your-Fingerprint-public-API-key` with your own one in the above commands.
 
 #### Approov Site Key
 
@@ -322,8 +322,8 @@ Check that you are correctly loading the Fingerprint SDK in the `initFingerprint
 
 ### Fingerprint Token
 
-Check that you are using the correct Fingerprint browser token:
-* The configuration file `shapes-app/config.js` exists and the placeholder `___FINGERPRINT_BROWSER_TOKEN___` has been replaced
+Check that you are using the correct Fingerprint public API key:
+* The configuration file `shapes-app/config.js` exists and the placeholder `___FINGERPRINT_PUBLIC_API_KEY___` has been replaced
 * The token doesn't have a typo
 
 ### Approov Site Key
@@ -344,7 +344,7 @@ approov api -list
 
 Check that you have correctly added your Fingerprint subscription with the Approov CLI:
 
-* check the Fingerprint browser token is correct
+* check the Fingerprint public API key is correct
 
 ```text
 approov web -fingerprint -list
@@ -354,14 +354,14 @@ The output should look like this:
 
 ```text
 Optional: true
-Subscription Key: your-Fingerprint-browser-token
+Subscription Key: your-Fingerprint-public-API-key
   Region: RoW
   Max Elapsed Time: 2.00s
   Max Bot Probability: 1.00
   Embed Result: true
 ```
 
-If the Fingerprint Subscription Key (Browser token) is correct, then the next step is to check the Fingerprint secret. For security reasons the Approov CLI never outputs or returns the Fingerprint secret after it is set. To ensure the value is correct you can just re-register the site using [the same CLI command](#register-fingerprint-with-approov) and it will overwrite the entries.
+If the Fingerprint subscription key (public API key) is correct, then the next step is to check the Fingerprint secret. For security reasons the Approov CLI never outputs or returns the Fingerprint secret after it is set. To ensure the value is correct you can just re-register the site using [the same CLI command](#register-fingerprint-with-approov) and it will overwrite the entries.
 
 ### Approov Live Metrics
 
