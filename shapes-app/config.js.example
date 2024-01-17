@@ -7,5 +7,5 @@ export const SHAPES_API_KEY = "yXClypapWNHIifHUWmBIyPFAm"
 // Approov web site key
 export const APPROOV_SITE_KEY = '___APPROOV_SITE_KEY___'
 
-// Fingerprint browser token
-export const FINGERPRINT_BROWSER_TOKEN = '___FINGERPRINT_BROWSER_TOKEN___'
+// Fingerprint public API key
+export const FINGERPRINT_PUBLIC_API_KEY = '___FINGERPRINT_PUBLIC_API_KEY___'

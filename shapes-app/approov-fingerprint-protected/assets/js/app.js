@@ -1,5 +1,5 @@
 
-import { APPROOV_ATTESTER_DOMAIN, SHAPES_API_KEY, APPROOV_SITE_KEY, FINGERPRINT_BROWSER_TOKEN } from "/config.js"
+import { APPROOV_ATTESTER_DOMAIN, SHAPES_API_KEY, APPROOV_SITE_KEY, FINGERPRINT_PUBLIC_API_KEY } from "/config.js"
 import { Approov, ApproovError, ApproovFetchError, ApproovServiceError, ApproovSessionError } from "./approov.js"
 
 let fpPromise
@@ -23,7 +23,7 @@ const API_BASE_URL = "https://" + API_DOMAIN
 
 function initFingerprint() {
   // Initialize the Fingerprint agent
-  const fpPromise = import('https://fpjscdn.net/v3/' + FINGERPRINT_BROWSER_TOKEN)
+  const fpPromise = import('https://fpjscdn.net/v3/' + FINGERPRINT_PUBLIC_API_KEY)
     .then(FingerprintJS => FingerprintJS.load())
   return fpPromise
 }
@@ -44,12 +44,12 @@ async function fetchApproovToken(api) {
       await Approov.initializeSession({
         approovHost: APPROOV_ATTESTER_DOMAIN,
         approovSiteKey: APPROOV_SITE_KEY,
-        fingerprintBrowserToken: FINGERPRINT_BROWSER_TOKEN,
+        fingerprintPublicAPIKey: FINGERPRINT_PUBLIC_API_KEY,
       })
       // Get a fresh Fingerprint result
       let result = await getFingerprintData()
       // Fetch the Approov token
-      let approovToken = await Approov.fetchToken(api, {fingerprintRequest: result})
+      let approovToken = await Approov.fetchToken(api, {fingerprintIDResult: result})
       return approovToken
     } else {
       throw error
